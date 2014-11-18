@@ -22,6 +22,35 @@ class Block:
         self.x = self.x + rel[0]
         self.y = self.y + rel[1]
 
+    def testcolpo(self,lst):
+        if lst[0].collidePoint == True:
+            lst[0], lst[9] = lst[9], lst[0]
+            print("lst[0]- True")
+        if lst[1].collidePoint == True:
+            lst[1], lst[9] = lst[9], lst[1]
+            print("lst[1]- True")
+        if lst[2].collidePoint == True:
+            lst[2], lst[9] = lst[9], lst[2]
+            print("lst[2]- True")
+        if lst[3].collidePoint == True:
+            lst[3], lst[9] = lst[9], lst[3]
+            print("lst[3]- True")
+        if lst[4].collidePoint == True:
+            lst[4], lst[9] = lst[9], lst[4]
+            print("lst[4]- True")
+        if lst[5].collidePoint == True:
+            lst[5], lst[9] = lst[9], lst[5]
+            print("lst[5]- True")
+        if lst[6].collidePoint == True:
+            lst[6], lst[9] = lst[9], lst[6]
+            print("lst[6]- True")
+        if lst[7].collidePoint == True:
+            lst[7], lst[9] = lst[9], lst[7]
+            print("lst[7]- True")
+        if lst[8].collidePoint == True:
+            lst[8], lst[9] = lst[9], lst[8]
+            print("lst[8]- True")
+        return lst
 
     def event(self, event):
         """
@@ -36,8 +65,10 @@ class Block:
                     self.color = (10,50,70)
                 self.draw()
                 self.drag = True
+                self.render(screen)
 
-            if self.collidePoint2(e.pos):
+
+            if self.collidePoint2(event.pos):
                 self.dragpinkarea = True
 
         if event.type == MOUSEBUTTONUP:
@@ -64,17 +95,16 @@ class Block:
         return coords[0], coords[1]
 
     def collidePoint(self, mcoords):
-        if self.x <= mcoords[0] <= (self.x+self.height) and self.y <= mcoords[1] <= (self.y+self.width):
+        if self.x <= mcoords[0] <= (self.x+self.width) and self.y <= mcoords[1] <= (self.y+self.height):
             return True
         else:
             return False
 
     def collidePoint2(self, mcoords): #для розовой области
         if self.width+ self.x-10 <= mcoords[0] <= (self.width+self.x) and self.height+self.y-10 <= mcoords[1] <= (self.height+self.y):
-            print("True")
             return True
         else:
-            print("False")
+
             return False
 
     def draw(self): #Рисует объект
@@ -96,13 +126,31 @@ screen = pygame.display.get_surface()
 
 
 
-block1 = Block((10,10), 50, 50, (10,50,70) )
-block2 = Block((100,10), 100, 100, (10,255,70) )
-block3 = Block((250,10), 50, 50, (10,50,70))
-block4 = Block((400,400), 100,100, (10,255,70))
+# block1 = Block((10,10), 50, 50, (10,50,70) )
+# block2 = Block((100,10), 50, 50, (10,50,70) )
+# block3 = Block((250,10), 50, 50, (10,50,70))
+# block4 = Block((400,400), 100,100, (10,50,70))
+x = 10
+y = 10
+w = 50
+h = 50
+i = 0
+l = 0
+lst = []
+while i<10:
+    a = Block((x+70*i,y), w, h,(10+i*20,50+i*20,70+i*20) )
+    if i>=5:
+        a = Block((x+70*l,y+200), w, h,(10+i*20,50+i*20,70+i*20))
+        l+=1
+    lst.append(a)
+    i+=1
+i = 0
+# lst.append(block1)
+# lst.append(block2)
 
 done = False
 while not done:
+    i = 0
     for e in pygame.event.get():
 
         if e.type == pygame.QUIT :
@@ -112,27 +160,24 @@ while not done:
             if e.key == K_ESCAPE:
                 done = True
 
+        while i<len(lst):
+            lst[i].event(e)
 
-        block1.event(e)
-        block2.event(e)
-        block3.event(e)
-        block4.event(e)
-
-
-
-
-
+            i+=1
+        # block1.event(e)
+        # block2.event(e)
+        # block3.event(e)
+        # block4.event(e)
         # if e.type == pygame.MOUSEMOTION:
         #     block1.event(e)
         #     print(e)
-
-
-
-
-
     screen.fill((0,0,0))
-    block1.render(screen)
-    block2.render(screen)
-    block3.render(screen)
-    block4.render(screen)
+    # block1.render(screen)
+    # block2.render(screen)
+    # block3.render(screen)
+    # block4.render(screen)
+    k = 0
+    while k < 10:
+        lst[k].render(screen)
+        k+=1
     pygame.display.flip()
