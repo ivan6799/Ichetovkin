@@ -1,3 +1,7 @@
-a = [0,5,8,4,8,8,4,4,56,4]
-a[0], a[8]= a[8], a[0]
-print(a)
+class Test:
+    def __init__(self,type):
+        self.type = type
+    def __len__(self):
+        return 150
+a = Test("ass")
+print(len(a))
