@@ -6,6 +6,8 @@ def load_image(name, alpha_cannel=False, path='Images'):
         image = pygame.image.load(fullname) # Загружаем картинку и сохраняем поверхность (Surface)
     except (pygame.error): # Если картинки нет на месте
         print("Cannot load image:", name)
+        print(fullname)
+
         return 0
     if(alpha_cannel):
         image = image.convert_alpha()

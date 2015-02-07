@@ -95,60 +95,13 @@ class Block:
     def render(self, screen): #Отображает объект на эакран
         screen.blit(self.image, self.rect)
 
-class Buttom:
-    def __init__(self, coords, images):
-        self.image = load_image(images[0])
-        self.image2 = load_image(images[1])
-        self.image3 = load_image(images[2])
-        self.lst = [self.image, self.image2, self.image3]
-        self.rect = self.image.get_rect()
-        self.S = testf1(self.rect.w, self.rect.h)
-        self.rect.topleft = coords
-        self.font = pygame.font.Font(None, 30)
-        self.text = self.font.render( "Click me", True, (255,255,255),None)
-        self.textRect = self.text.get_rect()
-        self.textRect.center = self.rect.center
 
-
-    def render(self, screen): #Отображает объект на эакран
-        screen.blit(self.lst[0], self.rect)
-        screen.blit(self.text, self.textRect)
-
-
-    def event(self, event):
-        if event.type == MOUSEMOTION:
-            if self.rect.collidepoint(event.pos) and self.lst[0]==self.image:
-                self.lst[0], self.lst[1] = self.lst[1], self.lst[0]
-            if self.rect.collidepoint(event.pos)==False and self.lst[0]!=self.image:
-                self.lst[1],self.lst[0] = self.lst[0], self.lst[1]
-        elif event.type == MOUSEBUTTONDOWN:
-            if self.rect.collidepoint(event.pos) and self.lst[0]!= self.image:
-                self.lst[0], self.lst[2] = self.lst[2], self.lst[0]
-                print(self.S)
-        elif event.type == MOUSEBUTTONUP and self.lst[0]!= self.image:
-                self.lst[0], self.lst[2] = self.lst[2], self.lst[0]
-
-class OffB(Buttom):
-    def __init__(self, coords, images):
-        super().__init__(coords, images)
-        self.image4 = load_image(images[3])
-
-    def event(self, event):
-        super().event(event)
-        if event.type == MOUSEBUTTONDOWN:
-            if self.rect.collidepoint(event.pos):
-                self.image = self.image4
-                self.lst[0] = self.image4
-    def render(self, screen):
-        super().render(screen)
         
 
 
 pygame.init()
 display = pygame.display.set_mode((700,700))
 screen = pygame.display.get_surface()
-test = Buttom((50,50),["button_hover.png","button_on.png","button_click.png"])
-test2 = OffB((400,50),["button_hover.png","button_on.png","button_click.png","button_off.png"])
 x = 10
 y = 10
 w = 50
@@ -177,20 +130,14 @@ while not done:
         if e.type == pygame.KEYDOWN:
             if e.key == K_ESCAPE:
                 done = True
-        test.event(e)
-        test2.event(e)
-
-
-        # for block in blocks:
-        #     if block.event(e):
-        #         if blocks.index(block)!=len(blocks)-1:
-        #             blocks.remove(block)
-        #             blocks.append(block)
+        for block in blocks:
+            if block.event(e):
+                if blocks.index(block)!=len(blocks)-1:
+                    blocks.remove(block)
+                    blocks.append(block)
 
     screen.fill((0,0,0))
-    # for block in blocks:
-    #     block.render(screen)
-    test.render(screen)
-    test2.render(screen)
+    for block in blocks:
+        block.render(screen)
     pygame.display.flip()
 
