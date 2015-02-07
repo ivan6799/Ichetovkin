@@ -1,6 +1,6 @@
 import pygame, sys, random, os
 from pygame.locals import *
-from Classes import Vector
+from Classes.Vector import Vector
 from Util.loads import load_image
 
 MOVE = 0
@@ -18,9 +18,9 @@ class Car:
         self.rect = self.image.get_rect()
         self.pos = [pos[0],pos[1]] #Позиция/кординаты объекта на экране
         self.rect.topleft = pos
-        self.acsel = 0
-        self.d_acsel = 0
-        self.speed = (50,0)
+        self.acsel = Vector((0,0))
+        # self.d_acsel = 0
+        self.speed = Vector((50,50))
         self.status = MOVE
 
     def event(self, event):
@@ -29,25 +29,27 @@ class Car:
         """
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                self.status = MOVE_UP
-                self.d_acsel += 12
+                self.acsel = self.speed.normalize()* 2
             elif event.key == K_DOWN:
-                self.status = MOVE_DOWN
-                self.d_acsel += -6
+                 self.acsel = self.speed.normalize()* -2
         elif event.type == KEYUP:
-            self.d_acsel = 0
+            self.acsel = Vector((0,0))
+
+    def aclerate(self):
+        self.speed = self.speed + self.acsel
+
 
     def move(self, dt):
         """
         Передвигаем объект
         """
-
-        self.rect.y = self.rect.y + (self.speed[1]*(dt/1000))
-        self.rect.x = self.rect.x + (self.speed[0]*(dt/1000)) + (self.acsel*(dt/1000))
+        self.aclerate()
+        self.rect.y = self.rect.y + (self.speed.y*(dt/1000))
+        self.rect.x = self.rect.x + (self.speed.x*(dt/1000))
 
     def change_acsel_and_speed(self):
         self.acsel += self.d_acsel
-        self.speed[0]+=self.acsel
+        self.speed.x+=self.acsel
 
 
 
@@ -68,7 +70,7 @@ class Car:
 
         # pygame.draw.line(screen, (255,0,0), False, [self.rect.center, (self.rect.centerx+self.speed[0], self.rect.centery+self.speed[1])])
         screen.blit( self.image, self.rect)
-        pygame.draw.lines(screen, (255,0,0), False, [self.rect.center,  (self.rect.centerx+self.speed[0], self.rect.centery+self.speed[1])])
+        pygame.draw.lines(screen, (255,0,0), False, [self.rect.center,  (self.rect.centerx+self.speed.x, self.rect.centery+self.speed.y)])
 
 
 
