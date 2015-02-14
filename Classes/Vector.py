@@ -32,7 +32,7 @@ class Vector:
         pass
 
     def as_point(self):
-        return self.x,self.y
+        return self.x, self.y
 
     def rotate(self, angle):
         angle = math.radians(angle)

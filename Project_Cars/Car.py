@@ -44,7 +44,7 @@ class Car:
 
 
     def aclerate(self):
-        self.speed = self.speed + self.acsel
+        self.speed += self.acsel
 
 
     def move(self, dt):
@@ -52,10 +52,9 @@ class Car:
         Передвигаем объект
         """
         self.aclerate()
-        print("rect.x before =",self.rect.x)
-        self.rect.y = self.rect.y + (self.speed.y*(dt/1000))
-        self.rect.x = self.rect.x + (self.speed.x*(dt/1000))
-        print(self.speed, self.rect.topleft)
+        self.pos += self.speed*(dt/1000)
+        # self.rect.y = self.rect.y + (self.speed.y*(dt/1000))
+        # self.rect.x = self.rect.x + (self.speed.x*(dt/1000))
 
 
     def update(self, dt):
@@ -65,10 +64,10 @@ class Car:
         Как правило, из данного метода вызываются другие методы, которые изменяют нужное состояние объекта
 
         """
-        # if self.status == TURN_RIGHT:
-        #     self.speed.rotate(self.angle_speed/1000*dt)
-        # elif self.status == TURN_LEFT:
-        #     self.speed.rotate(-self.angle_speed/1000*dt)
+        if self.status == TURN_RIGHT:
+            self.speed.rotate(self.angle_speed/1000*dt)
+        elif self.status == TURN_LEFT:
+            self.speed.rotate(-self.angle_speed/1000*dt)
         self.move(dt)
 
 
@@ -83,9 +82,9 @@ class Car:
 
         rotated_img = pygame.transform.rotate(self.image, angle_of_rotate)
         rect_img = rotated_img.get_rect()
-        rect_img.center = self.rect.center
+        rect_img.center = self.pos.as_point()
         screen.blit(rotated_img, rect_img)
-        pygame.draw.lines(screen, (255,0,0), False, [self.rect.center,  (self.rect.centerx+self.speed.x, self.rect.centery+self.speed.y)])
+        pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
 
 
 
