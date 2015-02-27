@@ -6,8 +6,11 @@ from Util.loads import load_image
 MOVE = 0
 TURN_LEFT = 1
 TURN_RIGHT = 2
-MOVE_UP = 3
-MOVE_DOWN = 4
+STOP = 3
+ACSEL_UP = 4
+ACSEL_DOWN = 5
+
+
 
 
 
@@ -15,6 +18,7 @@ class Car:
     def __init__(self, pos):
         self.image = load_image('racecar.png', alpha_cannel=True, path='../Images')
         self.image = pygame.transform.rotate(self.image, -90)
+        self.image = pygame.transform.scale(self.image, (50,30))
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
         self.rect.topleft = pos
@@ -30,31 +34,48 @@ class Car:
         """
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                self.acsel = self.speed.normalize()* 2
+
+                self.acsel = self.speed.normalize()* +12
+                self.status = ACSEL_UP
             elif event.key == K_DOWN:
-                 self.acsel = self.speed.normalize()* -2
+                 self.acsel = self.speed.normalize()* -6
+                 self.status = ACSEL_DOWN
             elif event.key == K_LEFT:
                 self.status = TURN_LEFT
             elif event.key == K_RIGHT:
                 self.status = TURN_RIGHT
         elif event.type == KEYUP:
-            self.acsel = Vector((0,0))
-            self.status = MOVE
+            if event.key == K_LEFT:
+                self.status = MOVE
+            elif event.key == K_RIGHT:
+                self.status = MOVE
+            elif event.key == K_UP or event.key == K_DOWN:
+                self.acsel = Vector((0,0))
 
 
 
-    def aclerate(self):
-        self.speed += self.acsel
+    def aclerate(self,dt):
+
+        a = math.sqrt(self.speed.x**2+self.speed.y**2)
+        b = math.sqrt((self.acsel*(dt/1000)).x**2 + (self.acsel*(dt/1000)).y**2 )
+        if a<b:
+            if self.status == ACSEL_UP:
+                self.speed = self.speed + self.acsel*(dt/100)
+            if self.status == ACSEL_DOWN:
+                self.acsel = Vector((0,0))
+
+        else:
+            self.speed = self.speed + self.acsel*(dt/1000)
+
 
 
     def move(self, dt):
         """
         Передвигаем объект
         """
-        self.aclerate()
+        self.aclerate(dt)
         self.pos += self.speed*(dt/1000)
-        # self.rect.y = self.rect.y + (self.speed.y*(dt/1000))
-        # self.rect.x = self.rect.x + (self.speed.x*(dt/1000))
+        print(self.speed.len())
 
 
     def update(self, dt):
@@ -64,6 +85,7 @@ class Car:
         Как правило, из данного метода вызываются другие методы, которые изменяют нужное состояние объекта
 
         """
+
         if self.status == TURN_RIGHT:
             self.speed.rotate(self.angle_speed/1000*dt)
         elif self.status == TURN_LEFT:
