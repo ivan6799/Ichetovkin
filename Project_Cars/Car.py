@@ -2,6 +2,7 @@ import pygame, sys, random, os, math
 from pygame.locals import *
 from Classes.Vector import Vector
 from Util.loads import load_image
+from  Project_Cars.road import Road
 
 MOVE = 0
 TURN_LEFT = 1
@@ -18,7 +19,6 @@ class Car:
     def __init__(self, pos):
         self.image = load_image('racecar.png', alpha_cannel=True, path='../Images')
         self.image = pygame.transform.rotate(self.image, -90)
-        self.image = pygame.transform.scale(self.image, (50,30))
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
         self.rect.topleft = pos
@@ -35,10 +35,10 @@ class Car:
         if event.type == KEYDOWN:
             if event.key == K_UP:
 
-                self.acsel = self.speed.normalize()* +12
+                self.acsel = self.speed.normalize()* +24
                 self.status = ACSEL_UP
             elif event.key == K_DOWN:
-                 self.acsel = self.speed.normalize()* -6
+                 self.acsel = self.speed.normalize()* -12
                  self.status = ACSEL_DOWN
             elif event.key == K_LEFT:
                 self.status = TURN_LEFT
@@ -74,8 +74,8 @@ class Car:
         Передвигаем объект
         """
         self.aclerate(dt)
-        self.pos += self.speed*(dt/1000)
-        print(self.speed.len())
+        self.pos.x += self.speed.x*(dt/1000)
+        # print(self.speed.len())
 
 
     def update(self, dt):
@@ -107,6 +107,7 @@ class Car:
         rect_img.center = self.pos.as_point()
         screen.blit(rotated_img, rect_img)
         pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
+        print()
 
 
 
@@ -115,7 +116,9 @@ clock = pygame.time.Clock()
 pygame.init()
 display = pygame.display.set_mode((1000,1000))
 screen = pygame.display.get_surface()
-test = Car((100,100))
+# test = Car((250,100))
+test2 = Road((200,0))
+test = Car((test2.rect.center))
 
 
 
@@ -135,6 +138,8 @@ while not done:
 
     dt = clock.tick(FPS)
     test.update(dt)            #обновляем состояние объекта
+    test2.update(test.speed.len())
     screen.fill((0,0,0))
+    test2.render(screen)
     test.render(screen)      #отрисовываем объект
     pygame.display.flip()
