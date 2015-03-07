@@ -19,12 +19,14 @@ class Car:
     def __init__(self, pos):
         self.image = load_image('racecar.png', alpha_cannel=True, path='../Images')
         self.image = pygame.transform.rotate(self.image, -90)
+        self.image = pygame.transform.scale(self.image, (75,50))
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
         self.rect.topleft = pos
         self.acsel = Vector((0,0))
+        self.rect_img = self.image.get_rect()
         # self.d_acsel = 0
-        self.speed = Vector((10,0))
+        self.speed = Vector((0,-10))
         self.angle_speed = 40
         self.status = MOVE
 
@@ -66,6 +68,15 @@ class Car:
 
         else:
             self.speed = self.speed + self.acsel*(dt/1000)
+            print(self.speed.y)
+            print(self.speed.x)
+            if self.speed.y <= -80 :
+                    self.speed.y = -80
+            if self.speed.x <= -80 :
+                    self.speed.x = -80
+            if self.speed.x >= 80 :
+                    self.speed.x = 80
+
 
 
 
@@ -103,22 +114,22 @@ class Car:
             angle_of_rotate = 360-angle_of_rotate
 
         rotated_img = pygame.transform.rotate(self.image, angle_of_rotate)
-        rect_img = rotated_img.get_rect()
-        rect_img.center = self.pos.as_point()
-        screen.blit(rotated_img, rect_img)
+        self.rect_img = rotated_img.get_rect()
+        self.rect_img.center = self.pos.as_point()
+        screen.blit(rotated_img, self.rect_img)
         pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
-        print()
+        # pygame.draw.rect(screen,(255,0,0), self.rect_img)
+        # print()
 
 
 
 FPS = 40
 clock = pygame.time.Clock()
 pygame.init()
-display = pygame.display.set_mode((1000,1000))
+display = pygame.display.set_mode((750,650))
 screen = pygame.display.get_surface()
-# test = Car((250,100))
-test2 = Road((200,0))
-test = Car((test2.rect.center))
+testRoad = Road((200,0))
+testCar = Car((200+ testRoad.rect.w/2, 400))
 
 
 
@@ -134,12 +145,23 @@ while not done:
             if e.key == K_ESCAPE:
                 done = True
 
-        test.event(e) #Передаем все события объекту
-
+        testCar.event(e) #Передаем все события объекту
     dt = clock.tick(FPS)
-    test.update(dt)            #обновляем состояние объекта
-    test2.update(test.speed.len())
+    if testRoad.get_static_rect().colliderect(testCar.rect_img) == True or testRoad.get_static_rect2().colliderect(testCar.rect_img) :
+        if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
+            if testCar.speed.x>0:
+                testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
+            elif    testRoad.get_static_rect2().colliderect(testCar.rect_img) == True:
+                if testCar.speed.x<0:
+                    testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
+        testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
+
+
+
+
+    testCar.update(dt)            #обновляем состояние объекта
+    testRoad.update(testCar.speed.len())
     screen.fill((0,0,0))
-    test2.render(screen)
-    test.render(screen)      #отрисовываем объект
+    testRoad.render(screen)
+    testCar.render(screen)      #отрисовываем объект
     pygame.display.flip()
