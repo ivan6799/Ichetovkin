@@ -12,8 +12,8 @@ MOVE = 0
 TURN_LEFT = 1
 TURN_RIGHT = 2
 STOP = 3
-accel_UP = 4
-accel_DOWN = 5
+ACCEL_UP = 4
+ACCEL_DOWN = 5
 
 
 class Car:
@@ -46,10 +46,10 @@ class Car:
         if event.type == KEYDOWN:
             if event.key == K_UP:
                 self.accel = self.speed.normalize()*self.K_ACCELERATE + self.friction()
-                self.status = accel_UP
+                self.status = ACCEL_UP
             if event.key == K_DOWN:
                 self.accel = self.speed.normalize()*-self.K_ACCELERATE + self.friction()
-                self.status = accel_DOWN
+                self.status = ACCEL_DOWN
             elif event.key == K_LEFT:
                 self.accel = self.friction()
                 self.status = TURN_LEFT
@@ -67,18 +67,15 @@ class Car:
     def aclerate(self, dt):
 
         if self.speed < (self.accel*(dt/1000)):
-            if self.status == accel_UP:
+            if self.status == ACCEL_UP:
                 self.speed = self.speed + self.accel*(dt/1000)
-            if self.status == accel_DOWN:
+            if self.status == ACCEL_DOWN:
                 self.accel = Vector((0, 0))
         else:
             speed_temp = self.speed
             self.speed = self.speed + self.accel*(dt/1000)
             if self.speed.len() > self.max_speed:
                 self.speed = speed_temp
-
-
-
 
     def move(self, dt):
         """
@@ -147,7 +144,7 @@ while not done:
 
         testCar.event(e) #Передаем все события объекту
     dt = clock.tick(FPS)
-    if testRoad.get_static_rect().colliderect(testCar.rect_img) == True or testRoad.get_static_rect2().colliderect(testCar.rect_img) :
+    if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
         if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
             if testCar.speed.x>0:
                 testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
