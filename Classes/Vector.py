@@ -8,16 +8,25 @@ class Vector:
         self.y = coords[1]
 
     def __add__(self, other):
-        return Vector((self.x+other.x,self.y+other.y))
+        return Vector((self.x+other.x, self.y+other.y))
 
     def __repr__(self):
         return "v(%s,%s)"%(math.floor(self.x), math.floor(self.y))
 
     def __mul__(self, other):
-        return Vector((self.x*other,self.y*other))
+
+        return Vector((self.x*other, self.y*other))
 
     def __floordiv__(self, other):
-        return Vector((self.x/other,self.y/other))
+        return Vector((self.x/other, self.y/other))
+
+    def __gt__(self, other):
+        if math.sqrt(self.x**2+self.y**2) > math.sqrt(other.x**2+other.y**2):
+            return True
+
+    def __lt__(self, other):
+        if math.sqrt(self.x**2+self.y**2) < math.sqrt(other.x**2+other.y**2):
+            return True
 
     def len(self):
         return math.sqrt(self.x**2+self.y**2)

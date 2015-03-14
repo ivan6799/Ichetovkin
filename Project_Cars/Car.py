@@ -1,21 +1,25 @@
-import pygame, sys, random, os, math
+import pygame
+import sys
+import random
+import os
+import math
 from pygame.locals import *
 from Classes.Vector import Vector
 from Util.loads import load_image
-from  Project_Cars.road import Road
+from Project_Cars.road import Road
 
 MOVE = 0
 TURN_LEFT = 1
 TURN_RIGHT = 2
 STOP = 3
-ACSEL_UP = 4
-ACSEL_DOWN = 5
-
-
-
+accel_UP = 4
+accel_DOWN = 5
 
 
 class Car:
+    K_ACCELERATE = 24
+    K_FRICTION = -5
+
     def __init__(self, pos):
         self.image = load_image('racecar.png', alpha_cannel=True, path='../Images')
         self.image = pygame.transform.rotate(self.image, -90)
@@ -23,12 +27,17 @@ class Car:
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
         self.rect.topleft = pos
-        self.acsel = Vector((0,0))
+        self.accel = Vector((0, 0))
         self.rect_img = self.image.get_rect()
-        # self.d_acsel = 0
-        self.speed = Vector((0,-10))
+        self.speed = Vector((0, -10))
+        # self.friction = self.speed.normalize()*-5
         self.angle_speed = 40
         self.status = MOVE
+        self.max_speed = 80
+
+    def friction(self):
+        return self.speed.normalize()* self.K_FRICTION
+
 
     def event(self, event):
         """
@@ -36,15 +45,16 @@ class Car:
         """
         if event.type == KEYDOWN:
             if event.key == K_UP:
-
-                self.acsel = self.speed.normalize()* +24
-                self.status = ACSEL_UP
-            elif event.key == K_DOWN:
-                 self.acsel = self.speed.normalize()* -12
-                 self.status = ACSEL_DOWN
+                self.accel = self.speed.normalize()*self.K_ACCELERATE + self.friction()
+                self.status = accel_UP
+            if event.key == K_DOWN:
+                self.accel = self.speed.normalize()*-self.K_ACCELERATE + self.friction()
+                self.status = accel_DOWN
             elif event.key == K_LEFT:
+                self.accel = self.friction()
                 self.status = TURN_LEFT
             elif event.key == K_RIGHT:
+                self.accel = self.friction()
                 self.status = TURN_RIGHT
         elif event.type == KEYUP:
             if event.key == K_LEFT:
@@ -52,30 +62,20 @@ class Car:
             elif event.key == K_RIGHT:
                 self.status = MOVE
             elif event.key == K_UP or event.key == K_DOWN:
-                self.acsel = Vector((0,0))
+                self.accel = self.friction()
 
+    def aclerate(self, dt):
 
-
-    def aclerate(self,dt):
-
-        a = math.sqrt(self.speed.x**2+self.speed.y**2)
-        b = math.sqrt((self.acsel*(dt/1000)).x**2 + (self.acsel*(dt/1000)).y**2 )
-        if a<b:
-            if self.status == ACSEL_UP:
-                self.speed = self.speed + self.acsel*(dt/100)
-            if self.status == ACSEL_DOWN:
-                self.acsel = Vector((0,0))
-
+        if self.speed < (self.accel*(dt/1000)):
+            if self.status == accel_UP:
+                self.speed = self.speed + self.accel*(dt/1000)
+            if self.status == accel_DOWN:
+                self.accel = Vector((0, 0))
         else:
-            self.speed = self.speed + self.acsel*(dt/1000)
-            print(self.speed.y)
-            print(self.speed.x)
-            if self.speed.y <= -80 :
-                    self.speed.y = -80
-            if self.speed.x <= -80 :
-                    self.speed.x = -80
-            if self.speed.x >= 80 :
-                    self.speed.x = 80
+            speed_temp = self.speed
+            self.speed = self.speed + self.accel*(dt/1000)
+            if self.speed.len() > self.max_speed:
+                self.speed = speed_temp
 
 
 
