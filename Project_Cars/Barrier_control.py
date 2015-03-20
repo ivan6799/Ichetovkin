@@ -1,17 +1,13 @@
 import pygame, sys, random, os
 from pygame.locals import *
 from Util.loads import load_image
-
+from Project_Cars import  Barrier
 class Barrel:
-    def __init__(self, coords):
-        self.image = load_image("images.jpg", alpha_cannel=True, path='../Images' )
-        self.image = pygame.transform.scale(self.image, (50,50))
-        self.pos = coords
-        self.rect = self.image.get_rect()
-        self.rect.topleft = self.pos
+    def __init__(self):
+           self.barrels = []
 
     def update(self):
-        self.rect.y +=2
+        a = Barrel(50,50)
 
     def render(self,screen):
         screen.blit(self.image,self.rect)
@@ -23,7 +19,6 @@ if __name__=='__main__':
     pygame.init()
     display = pygame.display.set_mode((750,650))
     screen = pygame.display.get_surface()
-    test = Barrel((200,200))
 
     done = False
     while not done:
@@ -38,7 +33,7 @@ if __name__=='__main__':
                     done = True
 
         dt = clock.tick(FPS)
-        test.update()            #обновляем состояние объекта
+        # test.update()            #обновляем состояние объекта
         screen.fill((0,0,0))
-        test.render(screen)
+        # test.render(screen)
         pygame.display.flip()
