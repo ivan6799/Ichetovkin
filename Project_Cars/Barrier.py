@@ -10,11 +10,17 @@ class Barrel:
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
 
-    def update(self):
-        self.rect.y +=2
+    def update(self, speed=0):
+        self.rect.y += speed
 
-    def render(self,screen):
-        screen.blit(self.image,self.rect)
+    def render(self, screen):
+        """
+
+        :type self: object
+        """
+        screen.blit(self.image, self.rect)
+
+
 
 if __name__=='__main__':
 
@@ -27,10 +33,9 @@ if __name__=='__main__':
 
     done = False
     while not done:
-        # i = 0
         for e in pygame.event.get():
 
-            if e.type == pygame.QUIT :
+            if e.type == pygame.QUIT:
                 done = True
 
             if e.type == pygame.KEYDOWN:

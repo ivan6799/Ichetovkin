@@ -7,6 +7,7 @@ from pygame.locals import *
 from Classes.Vector import Vector
 from Util.loads import load_image
 from Project_Cars.road import Road
+from Project_Cars.Barrier_control import Barrel_Control
 
 MOVE = 0
 TURN_LEFT = 1
@@ -65,17 +66,22 @@ class Car:
                 self.accel = self.friction()
 
     def aclerate(self, dt):
+        speed_temp = self.speed
+        self.speed = self.speed + self.accel*(dt/1000)
+        if self.speed.y >=0:
+            self.speed = speed_temp
 
-        if self.speed < (self.accel*(dt/1000)):
-            if self.status == ACCEL_UP:
-                self.speed = self.speed + self.accel*(dt/1000)
-            if self.status == ACCEL_DOWN:
-                self.accel = Vector((0, 0))
-        else:
-            speed_temp = self.speed
-            self.speed = self.speed + self.accel*(dt/1000)
-            if self.speed.len() > self.max_speed:
-                self.speed = speed_temp
+
+        # if self.speed < (self.accel*(dt/1000)):
+        #     if self.status == ACCEL_UP:
+        #         self.speed = self.speed + self.accel*(dt/1000)
+        #     else:
+        #         self.accel = Vector((0, 0))
+        # else:
+        #     speed_temp = self.speed
+        #     self.speed = self.speed + self.accel*(dt/1000)
+        #     if self.speed.len() > self.max_speed:
+        #         self.speed = speed_temp
 
     def move(self, dt):
         """
@@ -127,6 +133,7 @@ display = pygame.display.set_mode((750,650))
 screen = pygame.display.get_surface()
 testRoad = Road((200,0))
 testCar = Car((200+ testRoad.rect.w/2, 400))
+testBarrel = Barrel_Control()
 
 
 
@@ -144,21 +151,26 @@ while not done:
 
         testCar.event(e) #Передаем все события объекту
     dt = clock.tick(FPS)
+
+    testCar.update(dt)            #обновляем состояние объекта
+    testBarrel.update(testCar.speed.len()/6)
+    testRoad.update(testCar.speed.len())
+    for barrel in testBarrel.barrels:
+        if barrel.rect.colliderect(testCar.rect_img):
+            testCar.accel = testCar.accel + testCar.speed.normalize()*-50
+            testBarrel.remove_barrel(barrel)
+
     if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
         if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
             if testCar.speed.x>0:
                 testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
-            elif    testRoad.get_static_rect2().colliderect(testCar.rect_img) == True:
+            elif testRoad.get_static_rect2().colliderect(testCar.rect_img) == True:
                 if testCar.speed.x<0:
                     testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
         testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
 
-
-
-
-    testCar.update(dt)            #обновляем состояние объекта
-    testRoad.update(testCar.speed.len())
     screen.fill((0,0,0))
     testRoad.render(screen)
     testCar.render(screen)      #отрисовываем объект
+    testBarrel.render(screen)
     pygame.display.flip()
