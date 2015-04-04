@@ -6,7 +6,7 @@ import math
 from pygame.locals import *
 from Classes.Vector import Vector
 from Util.loads import load_image
-from Project_Cars.road import Road
+from Project_Cars.road_control import Road_Control
 from Project_Cars.Barrier_control import Barrel_Control
 
 MOVE = 0
@@ -27,6 +27,7 @@ class Car:
         self.image = pygame.transform.scale(self.image, (75,50))
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
+        self.start_pos = Vector(pos)
         self.rect.topleft = pos
         self.accel = Vector((0, 0))
         self.rect_img = self.image.get_rect()
@@ -34,7 +35,8 @@ class Car:
         # self.friction = self.speed.normalize()*-5
         self.angle_speed = 40
         self.status = MOVE
-        self.max_speed = 80
+        self.max_speed = Vector((180, 0))
+        self.change_move_func = False
 
     def friction(self):
         return self.speed.normalize()* self.K_FRICTION
@@ -60,28 +62,36 @@ class Car:
         elif event.type == KEYUP:
             if event.key == K_LEFT:
                 self.status = MOVE
+                self.accel = self.friction()
             elif event.key == K_RIGHT:
                 self.status = MOVE
+                self.accel = self.friction()
             elif event.key == K_UP or event.key == K_DOWN:
                 self.accel = self.friction()
+                self.status = MOVE
+        else:
+            self.accel = self.friction()
 
     def aclerate(self, dt):
-        speed_temp = self.speed
-        self.speed = self.speed + self.accel*(dt/1000)
-        if self.speed.y >=0:
-            self.speed = speed_temp
+        # speed_temp = self.speed
+        # self.speed = self.speed + self.accel*(dt/1000)
+        # # if self.speed.y >=0:
+        # #     self.speed = speed_temp
+        # if self.speed > self.max_speed:
+        #     self.speed = speed_temp
 
 
-        # if self.speed < (self.accel*(dt/1000)):
-        #     if self.status == ACCEL_UP:
-        #         self.speed = self.speed + self.accel*(dt/1000)
-        #     else:
-        #         self.accel = Vector((0, 0))
-        # else:
-        #     speed_temp = self.speed
-        #     self.speed = self.speed + self.accel*(dt/1000)
-        #     if self.speed.len() > self.max_speed:
-        #         self.speed = speed_temp
+
+        if self.speed < (self.accel*(dt/1000)):
+            if self.status == ACCEL_UP:
+                self.speed = self.speed + self.accel*(dt/1000)
+            else:
+                self.accel = Vector((0, 0))
+        else:
+            speed_temp = self.speed
+            self.speed = self.speed + self.accel*(dt/1000)
+            if self.speed > self.max_speed:
+                self.speed = speed_temp
 
     def move(self, dt):
         """
@@ -90,6 +100,13 @@ class Car:
         self.aclerate(dt)
         self.pos.x += self.speed.x*(dt/1000)
         # print(self.speed.len())
+
+    def move2(self, dt):
+        """
+        Нужен для движения машины в последнем блоке дороги
+        """
+        self.aclerate(dt)
+        self.pos += self.speed*(dt/1000)
 
 
     def update(self, dt):
@@ -104,7 +121,21 @@ class Car:
             self.speed.rotate(self.angle_speed/1000*dt)
         elif self.status == TURN_LEFT:
             self.speed.rotate(-self.angle_speed/1000*dt)
-        self.move(dt)
+
+        if self.status == MOVE:
+            """
+            Регулирует движение машины, когда событий нет
+            """
+            if self.speed < (self.accel*(dt/1000)):
+                if self.status == ACCEL_UP:
+                    self.speed = self.speed + self.accel*(dt/1000)
+                else:
+                    self.accel = Vector((0, 0))
+
+        if self.change_move_func == False:
+            self.move(dt)
+        elif self.change_move_func == True:
+            self.move2(dt)
 
 
 
@@ -125,14 +156,15 @@ class Car:
         # print()
 
 
-
+SCREEN_X = 750
+SCREEN_Y = 650
 FPS = 40
 clock = pygame.time.Clock()
 pygame.init()
-display = pygame.display.set_mode((750,650))
+display = pygame.display.set_mode((SCREEN_X,SCREEN_Y))
 screen = pygame.display.get_surface()
-testRoad = Road((200,0))
-testCar = Car((200+ testRoad.rect.w/2, 400))
+testRoad = Road_Control()
+testCar = Car((200+ (testRoad.x2-testRoad.x1)/2, 400))
 testBarrel = Barrel_Control()
 
 
@@ -152,13 +184,41 @@ while not done:
         testCar.event(e) #Передаем все события объекту
     dt = clock.tick(FPS)
 
+    pos1 = testCar.pos
     testCar.update(dt)            #обновляем состояние объекта
-    testBarrel.update(testCar.speed.len()/6)
-    testRoad.update(testCar.speed.len())
+    if testCar.rect_img.y + testCar.rect_img.h >= SCREEN_Y: #Проверяет выход за рабочую зону
+        if testCar.speed.y>=0:
+            testCar.pos = pos1
+
+    """
+    Следющий блок отвечает за направление дороги, а так же не позволяет выйти машине за нижний предел
+    """
+    if testCar.speed.y<0:
+        testBarrel.update(int(testCar.speed.y/10*-1))
+        testRoad.update(int(testCar.speed.y/3*-1))
+        if testCar.pos.y<= testCar.start_pos.y:
+            testCar.change_move_func = False
+    else:
+        if testRoad.roads[3].rect.colliderect(testCar.rect_img):
+            testCar.change_move_func = True
+            testBarrel.update(0)
+            testRoad.update(0)
+
+        else:
+            testCar.change_move_func = False
+            testBarrel.update(int(testCar.speed.y/10*-1))
+            testRoad.update(int(testCar.speed.y/3*-1))
+    """
+    Проверяет столкновение машины с бочкой
+            """
+
     for barrel in testBarrel.barrels:
         if barrel.rect.colliderect(testCar.rect_img):
-            testCar.accel = testCar.accel + testCar.speed.normalize()*-50
+            testCar.speed = testCar.speed*0.5
             testBarrel.remove_barrel(barrel)
+    """
+    Проверяет выход машины за дорогу
+            """
 
     if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
         if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
@@ -168,6 +228,8 @@ while not done:
                 if testCar.speed.x<0:
                     testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
         testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
+
+
 
     screen.fill((0,0,0))
     testRoad.render(screen)

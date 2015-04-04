@@ -4,7 +4,7 @@ from Util.loads import load_image
 from Project_Cars import  Barrier
 
 
-LEN_BARREL_SPAWN = 200
+LEN_BARREL_SPAWN = 300
 
 
 class Barrel_Control:
@@ -32,9 +32,6 @@ class Barrel_Control:
             self.add_barrel()
         for i in self.barrels:
             i.update(speed)
-        for barrel in self.barrels:
-            if barrel.rect.y > self.remove_pos:
-                self.remove_barrel(barrel)
 
     def render(self,screen):
         for i in self.barrels:
