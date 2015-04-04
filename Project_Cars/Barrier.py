@@ -1,7 +1,7 @@
 import pygame, sys, random, os
 from pygame.locals import *
 from Util.loads import load_image
-
+# Hello world
 class Barrel:
     def __init__(self, coords):
         self.image = load_image("images.jpg", alpha_cannel=True, path='../Images' )
