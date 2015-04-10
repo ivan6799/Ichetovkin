@@ -8,11 +8,10 @@ def testf1():
 Кнопка, получает координаты, изображения, функцию, надпись
 """
 class Button:
-    def __init__(self, coords = (0,0), images = ("button_hover.png","button_on.png","button_click.png"), func = testf1, note = "Hello world"):
-        self.image = load_image(images[0])
-        self.image2 = load_image(images[1])
-        self.image3 = load_image(images[2])
-        self.car = load_image('racecar.png', alpha_cannel=True)
+    def __init__(self, coords = (0,0), images = ("button_hover.png","button_on.png","button_click.png"), func = testf1, note = "Hello world", path = '../Images'):
+        self.image = load_image(images[0], alpha_cannel=True)
+        self.image2 = load_image(images[1], alpha_cannel=True)
+        self.image3 = load_image(images[2], alpha_cannel=True)
         self.lst = [self.image, self.image2, self.image3]
         self.rect = self.image.get_rect()
         self.func = func
@@ -24,7 +23,7 @@ class Button:
 
 
     def render(self, screen): #Отображает объект на эакран
-        screen.blit(self.car, self.rect)
+        screen.blit(self.image, self.rect)
         screen.blit(self.text, self.textRect)
 
 
@@ -68,7 +67,7 @@ if __name__ == '__main__':
     pygame.init()
     display = pygame.display.set_mode((700,700))
     screen = pygame.display.get_surface()
-    MainBut = Button((50,50),["button_hover.png","button_on.png","button_click.png"], testf1, "Hello world")
+    MainBut = Button()
     ModBut1 = OffB((400,50),["button_hover.png","button_on.png","button_click.png","button_off.png"], testf1, "Hello world", "Well done")
     ModBut2 = OffB((200,200),["button_hover.png","button_on.png","button_click.png","button_off.png"], testf1, "Hello world", "Well done")
 

@@ -1,13 +1,13 @@
-import pygame
-import sys
-import random
-import os
 import math
+
+import pygame
 from pygame.locals import *
+
 from Classes.Vector import Vector
 from Util.loads import load_image
 from Project_Cars.road_control import Road_Control
 from Project_Cars.Barrier_control import Barrel_Control
+
 
 MOVE = 0
 TURN_LEFT = 1
@@ -24,7 +24,7 @@ class Car:
     def __init__(self, pos):
         self.image = load_image('racecar.png', alpha_cannel=True, path='../Images')
         self.image = pygame.transform.rotate(self.image, -90)
-        self.image = pygame.transform.scale(self.image, (75,50))
+        self.image = pygame.transform.scale(self.image, (75, 50))
         self.rect = self.image.get_rect()
         self.pos = Vector(pos)
         self.start_pos = Vector(pos)
@@ -34,13 +34,22 @@ class Car:
         self.speed = Vector((0, -10))
         # self.friction = self.speed.normalize()*-5
         self.angle_speed = 40
-        self.status = MOVE
+        self.status_accel = MOVE
+        self.status_turn = MOVE
         self.max_speed = Vector((180, 0))
         self.change_move_func = False
 
-    def friction(self):
-        return self.speed.normalize()* self.K_FRICTION
 
+    def friction(self):
+        return self.speed.normalize()*self.K_FRICTION
+
+    def text_render(self, screen):
+        a = str(int(self.speed.len()))
+        font = pygame.font.Font(None, 30)
+        text = font.render(a, True, (255,255,255),None)
+        textRect = text.get_rect()
+        textRect.topleft = (20,20)
+        screen.blit(text, textRect)
 
     def event(self, event):
         """
@@ -48,42 +57,30 @@ class Car:
         """
         if event.type == KEYDOWN:
             if event.key == K_UP:
+                self.status_accel = ACCEL_UP
                 self.accel = self.speed.normalize()*self.K_ACCELERATE + self.friction()
-                self.status = ACCEL_UP
             if event.key == K_DOWN:
+                self.status_accel = ACCEL_DOWN
                 self.accel = self.speed.normalize()*-self.K_ACCELERATE + self.friction()
-                self.status = ACCEL_DOWN
-            elif event.key == K_LEFT:
-                self.accel = self.friction()
-                self.status = TURN_LEFT
-            elif event.key == K_RIGHT:
-                self.accel = self.friction()
-                self.status = TURN_RIGHT
+            if event.key == K_LEFT:
+                self.status_turn = TURN_LEFT
+            if event.key == K_RIGHT:
+                self.status_turn = TURN_RIGHT
         elif event.type == KEYUP:
             if event.key == K_LEFT:
-                self.status = MOVE
-                self.accel = self.friction()
+                self.status_turn = MOVE
             elif event.key == K_RIGHT:
-                self.status = MOVE
-                self.accel = self.friction()
+                self.status_turn = MOVE
             elif event.key == K_UP or event.key == K_DOWN:
                 self.accel = self.friction()
-                self.status = MOVE
+                self.status_accel = MOVE
         else:
             self.accel = self.friction()
 
     def aclerate(self, dt):
-        # speed_temp = self.speed
-        # self.speed = self.speed + self.accel*(dt/1000)
-        # # if self.speed.y >=0:
-        # #     self.speed = speed_temp
-        # if self.speed > self.max_speed:
-        #     self.speed = speed_temp
-
-
 
         if self.speed < (self.accel*(dt/1000)):
-            if self.status == ACCEL_UP:
+            if self.status_accel == ACCEL_UP:
                 self.speed = self.speed + self.accel*(dt/1000)
             else:
                 self.accel = Vector((0, 0))
@@ -99,7 +96,7 @@ class Car:
         """
         self.aclerate(dt)
         self.pos.x += self.speed.x*(dt/1000)
-        # print(self.speed.len())
+        print(self.status_turn)
 
     def move2(self, dt):
         """
@@ -107,7 +104,6 @@ class Car:
         """
         self.aclerate(dt)
         self.pos += self.speed*(dt/1000)
-
 
     def update(self, dt):
         """
@@ -117,20 +113,21 @@ class Car:
 
         """
 
-        if self.status == TURN_RIGHT:
-            self.speed.rotate(self.angle_speed/1000*dt)
-        elif self.status == TURN_LEFT:
-            self.speed.rotate(-self.angle_speed/1000*dt)
+        if self.status_turn == TURN_RIGHT:
+            self.speed.rotate(self.angle_speed/500*dt)
+        if self.status_turn == TURN_LEFT:
+            self.speed.rotate(-self.angle_speed/500*dt)
 
-        if self.status == MOVE:
+        if self.status_accel == MOVE:
             """
             Регулирует движение машины, когда событий нет
             """
             if self.speed < (self.accel*(dt/1000)):
-                if self.status == ACCEL_UP:
+                if self.status_accel == ACCEL_UP:
                     self.speed = self.speed + self.accel*(dt/1000)
                 else:
                     self.accel = Vector((0, 0))
+
 
         if self.change_move_func == False:
             self.move(dt)
@@ -152,6 +149,7 @@ class Car:
         self.rect_img.center = self.pos.as_point()
         screen.blit(rotated_img, self.rect_img)
         pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
+        self.text_render(screen)
         # pygame.draw.rect(screen,(255,0,0), self.rect_img)
         # print()
 

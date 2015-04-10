@@ -29,7 +29,6 @@ class Road_Control:
 
         else:
             if self.roads[len(self.roads)-1].rect.y + self.h>=self.h*4:
-                print(len(self.roads))
                 a = Road((self.x1, self.h*-1))
                 b = Road((self.x1, a.rect.y + self.h))
                 c = Road((self.x1, b.rect.y + self.h))
