@@ -18,7 +18,7 @@ class Barrel_Control:
 
     def add_barrel(self):
         barrel_field = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
-        barrel = Barrier.Barrel((barrel_field, 0))
+        barrel = Barrier.Barrel((barrel_field, -50))
         self.barrels.append(barrel)
 
 

@@ -48,7 +48,7 @@ class Car:
         font = pygame.font.Font(None, 30)
         text = font.render(a, True, (255,255,255),None)
         textRect = text.get_rect()
-        textRect.topleft = (20,20)
+        textRect.topleft = (600,120)
         screen.blit(text, textRect)
 
     def event(self, event):
@@ -90,13 +90,27 @@ class Car:
             if self.speed > self.max_speed:
                 self.speed = speed_temp
 
+    def speed_metr(self, screen):
+        speedometer = load_image("speedometer.png", alpha_cannel=True, path='../Images')
+        speedometer = pygame.transform.scale(speedometer, (113, 56))
+        rectSpeedMetr = speedometer.get_rect()
+        rectSpeedMetr.topleft = (550,50)
+        a = (rectSpeedMetr.midtop[0]-rectSpeedMetr.bottomleft[0])/90
+        b = (rectSpeedMetr.midtop[1]-rectSpeedMetr.bottomleft[1])/90
+        c = (rectSpeedMetr.bottomright[1]-rectSpeedMetr.midtop[1])/90
+        d = (rectSpeedMetr.bottomright[0]-rectSpeedMetr.midtop[0])/90
+        if self.speed.len()<=90:
+            pygame.draw.lines(screen, (255,0,0), False, [(rectSpeedMetr.midbottom[0], rectSpeedMetr.midbottom[1]),  (rectSpeedMetr.bottomleft[0]+a*self.speed.len(),rectSpeedMetr.bottomleft[1]+b*self.speed.len())])
+        elif self.speed.len()>=90:
+            pygame.draw.lines(screen, (255,0,0), False, [(rectSpeedMetr.midbottom[0], rectSpeedMetr.midbottom[1]),  (rectSpeedMetr.midtop[0]+d*(self.speed.len()-90),rectSpeedMetr.midtop[1]+c*(self.speed.len()-90))])
+        screen.blit(speedometer, rectSpeedMetr)
+
     def move(self, dt):
         """
         Передвигаем объект
         """
         self.aclerate(dt)
         self.pos.x += self.speed.x*(dt/1000)
-        print(self.status_turn)
 
     def move2(self, dt):
         """
@@ -136,6 +150,7 @@ class Car:
 
 
 
+
     def render(self, screen):
         """
         Отрисовываем объект на поверхность screen
@@ -150,6 +165,7 @@ class Car:
         screen.blit(rotated_img, self.rect_img)
         pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
         self.text_render(screen)
+        self.speed_metr(screen)
         # pygame.draw.rect(screen,(255,0,0), self.rect_img)
         # print()
 
@@ -210,10 +226,10 @@ while not done:
     Проверяет столкновение машины с бочкой
             """
 
-    for barrel in testBarrel.barrels:
-        if barrel.rect.colliderect(testCar.rect_img):
-            testCar.speed = testCar.speed*0.5
-            testBarrel.remove_barrel(barrel)
+    # for barrel in testBarrel.barrels:
+    #     if barrel.rect.colliderect(testCar.rect_img):
+    #         testCar.speed = testCar.speed*0.5
+    #         testBarrel.remove_barrel(barrel)
     """
     Проверяет выход машины за дорогу
             """
