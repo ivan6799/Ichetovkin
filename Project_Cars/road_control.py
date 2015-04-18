@@ -22,6 +22,8 @@ class Road_Control:
             b = Road((self.x1, a.rect.y + self.h))
             c = Road((self.x1, b.rect.y + self.h))
             d= Road((self.x1, c.rect.y + self.h))
+            e = Road((self.x1, self.h*-2))
+            self.roads.append(e)
             self.roads.append(a)
             self.roads.append(b)
             self.roads.append(c)
@@ -33,10 +35,13 @@ class Road_Control:
                 b = Road((self.x1, a.rect.y + self.h))
                 c = Road((self.x1, b.rect.y + self.h))
                 d= Road((self.x1, c.rect.y + self.h))
+                e = Road((self.x1, self.h*-2))
+                self.roads.append(e)
                 self.roads.append(a)
                 self.roads.append(b)
                 self.roads.append(c)
                 self.roads.append(d)
+
 
 
 

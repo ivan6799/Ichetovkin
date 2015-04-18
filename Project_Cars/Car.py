@@ -32,11 +32,10 @@ class Car:
         self.accel = Vector((0, 0))
         self.rect_img = self.image.get_rect()
         self.speed = Vector((0, -10))
-        # self.friction = self.speed.normalize()*-5
         self.angle_speed = 40
         self.status_accel = MOVE
         self.status_turn = MOVE
-        self.max_speed = Vector((180, 0))
+        self.max_speed = Vector((181, 0))
         self.change_move_func = False
 
 
@@ -226,10 +225,10 @@ while not done:
     Проверяет столкновение машины с бочкой
             """
 
-    # for barrel in testBarrel.barrels:
-    #     if barrel.rect.colliderect(testCar.rect_img):
-    #         testCar.speed = testCar.speed*0.5
-    #         testBarrel.remove_barrel(barrel)
+    for barrel in testBarrel.barrels:
+        if barrel.rect.colliderect(testCar.rect_img):
+            testCar.speed = testCar.speed*0.6
+            testBarrel.remove_barrel(barrel)
     """
     Проверяет выход машины за дорогу
             """
