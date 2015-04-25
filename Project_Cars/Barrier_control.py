@@ -8,34 +8,72 @@ LEN_BARREL_SPAWN = 300
 
 
 class Barrel_Control:
-    def __init__(self, road_x=200, road_w=299, window_h=700, bil=5):
+    def __init__(self, road_x=200, road_w=299*2, window_h=700, bil=7):
         self.barrels = []
         self.x_start = road_x
         self.x_end = road_x+road_w
         self.remove_pos = window_h
+        self.barrel_score = int(0)
         self.max_barrels_in_line = bil
         self.road_parts = self.max_barrels_in_line+1
+        self.barrel_forfeit = int(0)
 
     def add_barrel(self):
         barrel_field = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
-        barrel = Barrier.Barrel((barrel_field, -50))
+        barrel_field2 = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
+        barrel_field3 = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
+        barrel = Barrier.Barrel((barrel_field, -150))
+        barrel2 = Barrier.Barrel((barrel_field2, -100))
+        barrel3 = Barrier.Barrel((barrel_field3, -50))
         self.barrels.append(barrel)
+        self.barrels.append(barrel2)
+        self.barrels.append(barrel3)
 
 
     def remove_barrel(self, barrel):
         self.barrels.remove(barrel)
 
-    def update(self, speed):
+    def update(self, speed, other):
         if not self.barrels:
             self.add_barrel()
         elif self.barrels[len(self.barrels)-1].rect.y >= LEN_BARREL_SPAWN:
             self.add_barrel()
         for i in self.barrels:
             i.update(speed)
+        for i in self.barrels:
+            self.barrel_score+= i.test_equal(other)
+
+
+    def text_render(self, screen):
+        font = pygame.font.Font(None, 20)
+        text = font.render("Пропущено бочек :", True, (0,255,0),None)
+        i = str(self.barrel_score)
+        text2 = font.render(i, True, (0,255,0),None)
+        textRect = text.get_rect()
+        textRect2 = text2.get_rect()
+        textRect.topleft = (20,60)
+        textRect2.topleft = (170,60)
+        screen.blit(text, textRect)
+        screen.blit(text2, textRect2)
+
+    def text_render2(self, screen):
+        font = pygame.font.Font(None, 20)
+        text = font.render("Сбито бочек:", True, (255,0,0),None)
+        i = str(self.barrel_forfeit)
+        text2 = font.render(i, True, (255,0,0),None)
+        textRect = text.get_rect()
+        textRect2 = text2.get_rect()
+        textRect.topleft = (20,80)
+        textRect2.topleft = (130,80)
+        screen.blit(text, textRect)
+        screen.blit(text2, textRect2)
+
 
     def render(self,screen):
         for i in self.barrels:
             i.render(screen)
+        self.text_render(screen)
+        self.text_render2(screen)
 
 if __name__== '__main__':
 

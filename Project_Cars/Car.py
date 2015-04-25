@@ -31,7 +31,7 @@ class Car:
         self.rect.topleft = pos
         self.accel = Vector((0, 0))
         self.rect_img = self.image.get_rect()
-        self.speed = Vector((0, -10))
+        self.speed = Vector((0, -20))
         self.angle_speed = 40
         self.status_accel = MOVE
         self.status_turn = MOVE
@@ -109,14 +109,14 @@ class Car:
         Передвигаем объект
         """
         self.aclerate(dt)
-        self.pos.x += self.speed.x*(dt/1000)
+        self.pos.x += self.speed.x*(dt/700)
 
     def move2(self, dt):
         """
         Нужен для движения машины в последнем блоке дороги
         """
         self.aclerate(dt)
-        self.pos += self.speed*(dt/1000)
+        self.pos += self.speed*(dt/700)
 
     def update(self, dt):
         """
@@ -162,15 +162,15 @@ class Car:
         self.rect_img = rotated_img.get_rect()
         self.rect_img.center = self.pos.as_point()
         screen.blit(rotated_img, self.rect_img)
-        pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
+        # pygame.draw.lines(screen, (255,0,0), False, [self.pos.as_point(),  (self.pos.x+self.speed.x, self.pos.y+self.speed.y)])
         self.text_render(screen)
         self.speed_metr(screen)
         # pygame.draw.rect(screen,(255,0,0), self.rect_img)
         # print()
 
 
-SCREEN_X = 750
-SCREEN_Y = 650
+SCREEN_X = 1000
+SCREEN_Y = 800
 FPS = 40
 clock = pygame.time.Clock()
 pygame.init()
@@ -207,28 +207,33 @@ while not done:
     Следющий блок отвечает за направление дороги, а так же не позволяет выйти машине за нижний предел
     """
     if testCar.speed.y<0:
-        testBarrel.update(int(testCar.speed.y/10*-1))
-        testRoad.update(int(testCar.speed.y/3*-1))
+        testBarrel.update(int(testCar.speed.y/7*-1),testCar.rect.y)
+        testRoad.update(int(testCar.speed.y/7*-1))
         if testCar.pos.y<= testCar.start_pos.y:
             testCar.change_move_func = False
     else:
         if testRoad.roads[3].rect.colliderect(testCar.rect_img):
             testCar.change_move_func = True
-            testBarrel.update(0)
+            testBarrel.update(0,testCar.rect.y)
+            testRoad.update(0)
+        elif testRoad.roads[8].rect.colliderect(testCar.rect_img):
+            testCar.change_move_func = True
+            testBarrel.update(0,testCar.rect.y)
             testRoad.update(0)
 
         else:
             testCar.change_move_func = False
-            testBarrel.update(int(testCar.speed.y/10*-1))
-            testRoad.update(int(testCar.speed.y/3*-1))
+            testBarrel.update(int(testCar.speed.y/7*-1),testCar.rect.y)
+            testRoad.update(int(testCar.speed.y/7*-1))
     """
     Проверяет столкновение машины с бочкой
             """
 
     for barrel in testBarrel.barrels:
         if barrel.rect.colliderect(testCar.rect_img):
-            testCar.speed = testCar.speed*0.6
+            testCar.speed = testCar.speed*0.65
             testBarrel.remove_barrel(barrel)
+            testBarrel.barrel_forfeit+=1
     """
     Проверяет выход машины за дорогу
             """
@@ -242,7 +247,7 @@ while not done:
                     testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
         testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
 
-
+    print(dt)
 
     screen.fill((0,0,0))
     testRoad.render(screen)

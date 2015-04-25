@@ -9,9 +9,20 @@ class Barrel:
         self.pos = coords
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
+        self.equal = True
 
     def update(self, speed=0):
         self.rect.y += speed
+
+    def test_equal(self, other):
+        if self.equal == True:
+            if self.rect.y>=other:
+                self.equal = False
+                return 1
+            else:
+                return 0
+        else:
+            return 0
 
     def render(self, screen):
         """

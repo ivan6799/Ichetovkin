@@ -12,6 +12,7 @@ class Road_Control:
     def __init__(self, road_x=200, road_w=299, road_h = 297):
         self.roads = []
         self.x1 = road_x
+        self.w = road_w
         self.x2 = road_x+road_w
         self.h = road_h
 
@@ -23,11 +24,21 @@ class Road_Control:
             c = Road((self.x1, b.rect.y + self.h))
             d= Road((self.x1, c.rect.y + self.h))
             e = Road((self.x1, self.h*-2))
+            a2 = Road((self.x2, self.h*-1))
+            b2 = Road((self.x2, a2.rect.y + self.h))
+            c2 = Road((self.x2, b2.rect.y + self.h))
+            d2 = Road((self.x2, c2.rect.y + self.h))
+            e2 = Road((self.x2, self.h*-2))
             self.roads.append(e)
             self.roads.append(a)
             self.roads.append(b)
             self.roads.append(c)
             self.roads.append(d)
+            self.roads.append(e2)
+            self.roads.append(a2)
+            self.roads.append(b2)
+            self.roads.append(c2)
+            self.roads.append(d2)
 
         else:
             if self.roads[len(self.roads)-1].rect.y + self.h>=self.h*4:
@@ -36,11 +47,21 @@ class Road_Control:
                 c = Road((self.x1, b.rect.y + self.h))
                 d= Road((self.x1, c.rect.y + self.h))
                 e = Road((self.x1, self.h*-2))
+                a2 = Road((self.x2, self.h*-1))
+                b2 = Road((self.x2, a2.rect.y + self.h))
+                c2 = Road((self.x2, b2.rect.y + self.h))
+                d2 = Road((self.x2, c2.rect.y + self.h))
+                e2 = Road((self.x2, self.h*-2))
                 self.roads.append(e)
                 self.roads.append(a)
                 self.roads.append(b)
                 self.roads.append(c)
                 self.roads.append(d)
+                self.roads.append(e2)
+                self.roads.append(a2)
+                self.roads.append(b2)
+                self.roads.append(c2)
+                self.roads.append(d2)
 
 
 
@@ -55,7 +76,7 @@ class Road_Control:
         return self.staticrect
 
     def get_static_rect2(self):
-        self.staticrect2 = pygame.Rect((self.x2, 0), (self.x1, self.h*5))
+        self.staticrect2 = pygame.Rect((self.x2+self.w, 0), (self.x1, self.h*5))
         return self.staticrect2
 
 
