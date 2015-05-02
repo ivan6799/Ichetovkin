@@ -8,10 +8,10 @@ def testf1():
 Кнопка, получает координаты, изображения, функцию, надпись
 """
 class Button:
-    def __init__(self, coords = (0,0), images = ("button_hover.png","button_on.png","button_click.png"), func = testf1, note = "Hello world", path = '../Images'):
-        self.image = load_image(images[0], alpha_cannel=True)
-        self.image2 = load_image(images[1], alpha_cannel=True)
-        self.image3 = load_image(images[2], alpha_cannel=True)
+    def __init__(self, coords = (0,0), images = ("button_hover.png","button_off.png","button_click.png"), func = testf1, note = "Hello world"):
+        self.image = load_image(images[0], alpha_cannel=True, path='../Images')
+        self.image2 = load_image(images[1], alpha_cannel=True, path='../Images')
+        self.image3 = load_image(images[2], alpha_cannel=True, path='../Images')
         self.lst = [self.image, self.image2, self.image3]
         self.rect = self.image.get_rect()
         self.func = func
@@ -23,7 +23,7 @@ class Button:
 
 
     def render(self, screen): #Отображает объект на эакран
-        screen.blit(self.image, self.rect)
+        screen.blit(self.lst[0], self.rect)
         screen.blit(self.text, self.textRect)
 
 

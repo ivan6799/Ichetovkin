@@ -239,15 +239,14 @@ while not done:
             """
 
     if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
-        if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
+        if testRoad.get_static_rect().colliderect(testCar.rect_img):
             if testCar.speed.x>0:
                 testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
-            elif testRoad.get_static_rect2().colliderect(testCar.rect_img) == True:
+        elif testRoad.get_static_rect2().colliderect(testCar.rect_img):
                 if testCar.speed.x<0:
                     testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
         testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
 
-    print(dt)
 
     screen.fill((0,0,0))
     testRoad.render(screen)
