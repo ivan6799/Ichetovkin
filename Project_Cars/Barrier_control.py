@@ -3,8 +3,8 @@ from pygame.locals import *
 from Util.loads import load_image
 from Project_Cars import  Barrier
 
-
-LEN_BARREL_SPAWN = 300
+#Показывает через сколько пикселей создается новая партия ящиков
+LEN_BARREL_SPAWN = 100
 
 
 class Barrel_Control:
@@ -12,16 +12,15 @@ class Barrel_Control:
         self.barrels = []
         self.x_start = road_x
         self.x_end = road_x+road_w
-        self.remove_pos = window_h
-        self.barrel_score = int(0)
-        self.max_barrels_in_line = bil
-        self.road_parts = self.max_barrels_in_line+1
-        self.barrel_forfeit = int(0)
+        # self.remove_pos = window_h
+        self.barrel_score = 0
+        self.random_coordinate = bil
+        self.barrel_forfeit = 0
 
     def add_barrel(self):
-        barrel_field = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
-        barrel_field2 = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
-        barrel_field3 = self.x_start + (self.x_end-self.x_start)/self.road_parts*random.randint(0,self.max_barrels_in_line)
+        barrel_field = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
+        barrel_field2 = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
+        barrel_field3 = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
         barrel = Barrier.Barrel((barrel_field, -150))
         barrel2 = Barrier.Barrel((barrel_field2, -100))
         barrel3 = Barrier.Barrel((barrel_field3, -50))

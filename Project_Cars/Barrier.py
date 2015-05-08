@@ -1,10 +1,15 @@
-import pygame, sys, random, os
+import pygame
 from pygame.locals import *
+
 from Util.loads import load_image
-# Hello world
+
+
 class Barrel:
+    image = None
+
     def __init__(self, coords):
-        self.image = load_image("images.jpg", alpha_cannel=True, path='../Images' )
+        if not self.image:
+            self.image = load_image("images.png", alpha_cannel=True, path='../Images')
         self.image = pygame.transform.scale(self.image, (50,50))
         self.pos = coords
         self.rect = self.image.get_rect()

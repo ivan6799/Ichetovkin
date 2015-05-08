@@ -43,34 +43,38 @@ class Button:
 
         elif event.type == MOUSEBUTTONUP and self.lst[0] != self.image:
             self.lst[0], self.lst[2] = self.lst[2], self.lst[0]
+            print(True)
             return True
 
+if __name__ == '__main__':
 
-pygame.init()
-display = pygame.display.set_mode((700, 700))
-screen = pygame.display.get_surface()
-MainBut = Button((350 - 186 / 2, 150), ["button_hover.png", "button_off.png", "button_click.png"], testf1, "Start")
-MainBut2 = Button((350 - 186 / 2, 250), ["button_hover.png", "button_off.png", "button_click.png"], testf1,
-                  "Best score")
-MainBut3 = Button((350 - 186 / 2, 350), ["button_hover.png", "button_off.png", "button_click.png"], testf1, "Exit")
+    pygame.init()
+    display = pygame.display.set_mode((700, 700))
+    screen = pygame.display.get_surface()
+    MainBut = Button((350 - 186 / 2, 150), ["button_hover.png", "button_off.png", "button_click.png"], testf1, "Start")
+    MainBut2 = Button((350 - 186 / 2, 250), ["button_hover.png", "button_off.png", "button_click.png"], testf1,
+                      "Best score")
+    MainBut3 = Button((350 - 186 / 2, 350), ["button_hover.png", "button_off.png", "button_click.png"], testf1, "Exit")
 
-done1 = False
-while not done1:
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            done1 = True
-        if e.type == pygame.KEYDOWN:
-            if e.key == K_ESCAPE:
-                done1 = True
-        MainBut.event(e)
-        MainBut2.event(e)
-        MainBut3.event(e)
-        if MainBut3.event(e):
-            done = True
-        if MainBut.event(e):
-            from Project_Cars.Car import *
-    screen.fill((0, 0, 0))
-    MainBut.render(screen)
-    MainBut2.render(screen)
-    MainBut3.render(screen)
-    pygame.display.flip()
+    done2 = False
+    i = 0
+    while not done2:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                done2 = True
+            if e.type == pygame.KEYDOWN:
+                if e.key == K_ESCAPE:
+                    done2 = True
+            MainBut.event(e)
+            MainBut2.event(e)
+            MainBut3.event(e)
+            if MainBut3.event(e):
+                done2 = True
+            if MainBut.event(e):
+                from Project_Cars.Car import *
+                done2 = True
+        screen.fill((0, 0, 0))
+        MainBut.render(screen)
+        MainBut2.render(screen)
+        MainBut3.render(screen)
+        pygame.display.flip()

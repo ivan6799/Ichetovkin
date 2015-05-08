@@ -31,11 +31,12 @@ class Car:
         self.rect.topleft = pos
         self.accel = Vector((0, 0))
         self.rect_img = self.image.get_rect()
-        self.speed = Vector((0, -20))
+        self.speed = Vector((0, -10))
+        # self.friction = self.speed.normalize()*-5
         self.angle_speed = 40
         self.status_accel = MOVE
         self.status_turn = MOVE
-        self.max_speed = Vector((181, 0))
+        self.max_speed = Vector((180, 0))
         self.change_move_func = False
 
 
@@ -47,7 +48,7 @@ class Car:
         font = pygame.font.Font(None, 30)
         text = font.render(a, True, (255,255,255),None)
         textRect = text.get_rect()
-        textRect.topleft = (600,120)
+        textRect.topleft = (67,180)
         screen.blit(text, textRect)
 
     def event(self, event):
@@ -93,7 +94,7 @@ class Car:
         speedometer = load_image("speedometer.png", alpha_cannel=True, path='../Images')
         speedometer = pygame.transform.scale(speedometer, (113, 56))
         rectSpeedMetr = speedometer.get_rect()
-        rectSpeedMetr.topleft = (550,50)
+        rectSpeedMetr.topleft = (20,120)
         a = (rectSpeedMetr.midtop[0]-rectSpeedMetr.bottomleft[0])/90
         b = (rectSpeedMetr.midtop[1]-rectSpeedMetr.bottomleft[1])/90
         c = (rectSpeedMetr.bottomright[1]-rectSpeedMetr.midtop[1])/90
@@ -103,6 +104,7 @@ class Car:
         elif self.speed.len()>=90:
             pygame.draw.lines(screen, (255,0,0), False, [(rectSpeedMetr.midbottom[0], rectSpeedMetr.midbottom[1]),  (rectSpeedMetr.midtop[0]+d*(self.speed.len()-90),rectSpeedMetr.midtop[1]+c*(self.speed.len()-90))])
         screen.blit(speedometer, rectSpeedMetr)
+
 
     def move(self, dt):
         """
@@ -116,7 +118,7 @@ class Car:
         Нужен для движения машины в последнем блоке дороги
         """
         self.aclerate(dt)
-        self.pos += self.speed*(dt/700)
+        self.pos += self.speed*(dt/1000)
 
     def update(self, dt):
         """
@@ -168,88 +170,86 @@ class Car:
         # pygame.draw.rect(screen,(255,0,0), self.rect_img)
         # print()
 
+if __name__ == '__main__':
 
-SCREEN_X = 1000
-SCREEN_Y = 800
-FPS = 40
-clock = pygame.time.Clock()
-pygame.init()
-display = pygame.display.set_mode((SCREEN_X,SCREEN_Y))
-screen = pygame.display.get_surface()
-testRoad = Road_Control()
-testCar = Car((200+ (testRoad.x2-testRoad.x1)/2, 400))
-testBarrel = Barrel_Control()
+    SCREEN_X = 1000
+    SCREEN_Y = 800
+    FPS = 40
+    clock = pygame.time.Clock()
+    pygame.init()
+    display = pygame.display.set_mode((SCREEN_X,SCREEN_Y))
+    screen = pygame.display.get_surface()
+    testRoad = Road_Control()
+    testCar = Car((200+ (testRoad.x2-testRoad.x1)/2, 400))
+    testBarrel = Barrel_Control()
 
 
 
-done = False
-while not done:
-    # i = 0
-    for e in pygame.event.get():
+    done = False
+    while not done:
+        # i = 0
+        for e in pygame.event.get():
 
-        if e.type == pygame.QUIT :
-            done = True
-
-        if e.type == pygame.KEYDOWN:
-            if e.key == K_ESCAPE:
+            if e.type == pygame.QUIT :
                 done = True
 
-        testCar.event(e) #Передаем все события объекту
-    dt = clock.tick(FPS)
+            if e.type == pygame.KEYDOWN:
+                if e.key == K_ESCAPE:
+                    from Project_Cars.Menu import *
+                    break
 
-    pos1 = testCar.pos
-    testCar.update(dt)            #обновляем состояние объекта
-    if testCar.rect_img.y + testCar.rect_img.h >= SCREEN_Y: #Проверяет выход за рабочую зону
-        if testCar.speed.y>=0:
-            testCar.pos = pos1
+            testCar.event(e) #Передаем все события объекту
+        dt = clock.tick(FPS)
 
-    """
-    Следющий блок отвечает за направление дороги, а так же не позволяет выйти машине за нижний предел
-    """
-    if testCar.speed.y<0:
-        testBarrel.update(int(testCar.speed.y/7*-1),testCar.rect.y)
-        testRoad.update(int(testCar.speed.y/7*-1))
-        if testCar.pos.y<= testCar.start_pos.y:
-            testCar.change_move_func = False
-    else:
-        if testRoad.roads[3].rect.colliderect(testCar.rect_img):
-            testCar.change_move_func = True
-            testBarrel.update(0,testCar.rect.y)
-            testRoad.update(0)
-        elif testRoad.roads[8].rect.colliderect(testCar.rect_img):
-            testCar.change_move_func = True
-            testBarrel.update(0,testCar.rect.y)
-            testRoad.update(0)
+        pos1 = testCar.pos
+        testCar.update(dt)            #обновляем состояние объекта
+        if testCar.rect_img.y + testCar.rect_img.h >= SCREEN_Y: #Проверяет выход за рабочую зону
+            if testCar.speed.y>=0:
+                testCar.pos = pos1
 
+        """
+        Следющий блок отвечает за направление дороги, а так же не позволяет выйти машине за нижний предел
+        """
+        if testCar.speed.y<0:
+            testBarrel.update(int(testCar.speed.y/10*-1),testCar.pos.y)
+            testRoad.update(int(testCar.speed.y/3*-1))
+            if testCar.pos.y<= testCar.start_pos.y:
+                testCar.change_move_func = False
         else:
-            testCar.change_move_func = False
-            testBarrel.update(int(testCar.speed.y/7*-1),testCar.rect.y)
-            testRoad.update(int(testCar.speed.y/7*-1))
-    """
-    Проверяет столкновение машины с бочкой
-            """
+            if testRoad.roads[3].rect.colliderect(testCar.rect_img):
+                testCar.change_move_func = True
+                testBarrel.update(0,testCar.pos.y)
+                testRoad.update(0)
 
-    for barrel in testBarrel.barrels:
-        if barrel.rect.colliderect(testCar.rect_img):
-            testCar.speed = testCar.speed*0.65
-            testBarrel.remove_barrel(barrel)
-            testBarrel.barrel_forfeit+=1
-    """
-    Проверяет выход машины за дорогу
-            """
+            else:
+                testCar.change_move_func = False
+                testBarrel.update(int(testCar.speed.y/10*-1), testCar.speed.y)
+                testRoad.update(int(testCar.speed.y/3*-1))
+        """
+        Проверяет столкновение машины с бочкой
+                """
 
-    if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
-        if testRoad.get_static_rect().colliderect(testCar.rect_img):
-            if testCar.speed.x>0:
-                testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
-        elif testRoad.get_static_rect2().colliderect(testCar.rect_img):
-                if testCar.speed.x<0:
-                    testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/1000
-        testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/1000
+        for barrel in testBarrel.barrels:
+            if barrel.rect.colliderect(testCar.rect_img):
+                testCar.speed = testCar.speed*0.5
+                testBarrel.remove_barrel(barrel)
+        """
+        Проверяет выход машины за дорогу
+                """
+
+        if testRoad.get_static_rect().colliderect(testCar.rect_img) or testRoad.get_static_rect2().colliderect(testCar.rect_img):
+            if testRoad.get_static_rect().colliderect(testCar.rect_img) == True:
+                if testCar.speed.x>0:
+                    testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/700
+                elif testRoad.get_static_rect2().colliderect(testCar.rect_img) == True:
+                    if testCar.speed.x<0:
+                        testCar.pos.x = testCar.pos.x + testCar.speed.x*dt/7000
+            testCar.pos.x = testCar.pos.x - testCar.speed.x*dt/700
 
 
-    screen.fill((0,0,0))
-    testRoad.render(screen)
-    testCar.render(screen)      #отрисовываем объект
-    testBarrel.render(screen)
-    pygame.display.flip()
+
+        screen.fill((0,0,0))
+        testRoad.render(screen)
+        testCar.render(screen)      #отрисовываем объект
+        testBarrel.render(screen)
+        pygame.display.flip()
