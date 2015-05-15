@@ -18,7 +18,7 @@ class Road_Control:
 
 
     def add_road(self):
-        if len(self.roads)==0 :
+        if not self.roads:
             a = Road((self.x1, self.h*-1))
             b = Road((self.x1, a.rect.y + self.h))
             c = Road((self.x1, b.rect.y + self.h))
