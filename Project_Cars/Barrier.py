@@ -34,7 +34,8 @@ class Barrel:
 
         :type self: object
         """
-        screen.blit(self.image, self.rect)
+        if -500 <= self.rect.y <= 1000:
+            screen.blit(self.image, self.rect)
 
 
 

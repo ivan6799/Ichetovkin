@@ -56,6 +56,7 @@ if __name__ == '__main__':
                       "Best score")
     MainBut3 = Button((350 - 186 / 2, 350), ["button_hover.png", "button_off.png", "button_click.png"], testf1, "Exit")
 
+
     done2 = False
     i = 0
     while not done2:
@@ -77,4 +78,5 @@ if __name__ == '__main__':
         MainBut.render(screen)
         MainBut2.render(screen)
         MainBut3.render(screen)
+        screen.blit(background, background_rect)
         pygame.display.flip()

@@ -4,25 +4,21 @@ from Util.loads import load_image
 
 
 class Road:
+    image = None
     def __init__(self, coords):
-        self.image = load_image("pdn_road_example.png", alpha_cannel=True, path='../Images/road parts')
+        if not self.image:
+            Road.image = load_image("pdn_road_example.png", alpha_cannel=True, path='../Images/road parts')
         self.pos = coords
         self.rect = self.image.get_rect()
-        # print("Ширина картинки = ", self.rect.w)
-        # print("высота картинки = ", self.rect.h)
         self.rect.topleft = self.pos
 
     def update(self, speed):
         self.rect.y += speed
 
     def render(self, screen):
-        screen.blit(self.image, self.rect)
+        if -500 <= self.rect.y <= 1000:
+            screen.blit(self.image, self.rect)
 
-    def get_static_rect(self):
-        return pygame.Rect((0, 0), (self.rect.x, self.rect.h * 5))
-
-    def get_static_rect2(self):
-        return pygame.Rect((self.rect.x + self.rect.w, 0), (self.rect.x, self.rect.h * 5))
 
 
 if __name__ == '__main__':

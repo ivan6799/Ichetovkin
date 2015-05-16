@@ -7,7 +7,7 @@ from Classes.Vector import Vector
 from Util.loads import load_image
 from Project_Cars.road_control import Road_Control
 from Project_Cars.Barrier_control import Barrel_Control
-
+from Project_Cars.Fireball_control import Fireball_Controll
 
 MOVE = 0
 TURN_LEFT = 1
@@ -36,8 +36,10 @@ class Car:
         self.angle_speed = 40
         self.status_accel = MOVE
         self.status_turn = MOVE
-        self.max_speed = Vector((180, 0))
+        self.fire = False
+        self.max_speed = Vector((181, 0))
         self.change_move_func = False
+        self.angle_of_rotate = 0
 
 
     def friction(self):
@@ -66,6 +68,10 @@ class Car:
                 self.status_turn = TURN_LEFT
             if event.key == K_RIGHT:
                 self.status_turn = TURN_RIGHT
+            if event.key == K_SPACE:
+                self.fire = True
+
+
         elif event.type == KEYUP:
             if event.key == K_LEFT:
                 self.status_turn = MOVE
@@ -74,19 +80,19 @@ class Car:
             elif event.key == K_UP or event.key == K_DOWN:
                 self.accel = self.friction()
                 self.status_accel = MOVE
-        else:
-            self.accel = self.friction()
+
+
 
     def aclerate(self, dt):
 
-        if self.speed < (self.accel*(dt/1000)):
+        if self.speed < (self.accel*(dt/700)):
             if self.status_accel == ACCEL_UP:
-                self.speed = self.speed + self.accel*(dt/1000)
+                self.speed = self.speed + self.accel*(dt/700)
             else:
                 self.accel = Vector((0, 0))
         else:
             speed_temp = self.speed
-            self.speed = self.speed + self.accel*(dt/1000)
+            self.speed = self.speed + self.accel*(dt/700)
             if self.speed > self.max_speed:
                 self.speed = speed_temp
 
@@ -118,7 +124,7 @@ class Car:
         Нужен для движения машины в последнем блоке дороги
         """
         self.aclerate(dt)
-        self.pos += self.speed*(dt/1000)
+        self.pos += self.speed*(dt/700)
 
     def update(self, dt):
         """
@@ -137,6 +143,10 @@ class Car:
             """
             Регулирует движение машины, когда событий нет
             """
+            self.accel = self.friction()
+            # if self.accel*(dt/700)!=self.friction():
+            #     # print(self.accel, "self accel")
+            #     # print(self.friction(), "friction")
             if self.speed < (self.accel*(dt/1000)):
                 if self.status_accel == ACCEL_UP:
                     self.speed = self.speed + self.accel*(dt/1000)
@@ -156,11 +166,11 @@ class Car:
         """
         Отрисовываем объект на поверхность screen
         """
-        angle_of_rotate = math.degrees(math.acos(self.speed.normalize().x))
+        self.angle_of_rotate = math.degrees(math.acos(self.speed.normalize().x))
         if self.speed.y>0:
-            angle_of_rotate = 360-angle_of_rotate
+            self.angle_of_rotate = 360-self.angle_of_rotate
 
-        rotated_img = pygame.transform.rotate(self.image, angle_of_rotate)
+        rotated_img = pygame.transform.rotate(self.image, self.angle_of_rotate)
         self.rect_img = rotated_img.get_rect()
         self.rect_img.center = self.pos.as_point()
         screen.blit(rotated_img, self.rect_img)
@@ -182,6 +192,7 @@ if __name__ == '__main__':
     testRoad = Road_Control()
     testCar = Car((200+ (testRoad.x2-testRoad.x1)/2, 400))
     testBarrel = Barrel_Control()
+    testFireball = Fireball_Controll()
 
 
 
@@ -199,10 +210,13 @@ if __name__ == '__main__':
                     break
 
             testCar.event(e) #Передаем все события объекту
+            testFireball.event(e)
         dt = clock.tick(FPS)
 
         pos1 = testCar.pos
         testCar.update(dt)            #обновляем состояние объекта
+        testFireball.update(testCar.angle_of_rotate, testCar.pos.as_point())
+
         if testCar.rect_img.y + testCar.rect_img.h >= SCREEN_Y: #Проверяет выход за рабочую зону
             if testCar.speed.y>=0:
                 testCar.pos = pos1
@@ -231,7 +245,7 @@ if __name__ == '__main__':
 
         for barrel in testBarrel.barrels:
             if barrel.rect.colliderect(testCar.rect_img):
-                testCar.speed = testCar.speed*0.5
+                testCar.speed = testCar.speed*0.3
                 testBarrel.remove_barrel(barrel)
         """
         Проверяет выход машины за дорогу
@@ -252,4 +266,5 @@ if __name__ == '__main__':
         testRoad.render(screen)
         testCar.render(screen)      #отрисовываем объект
         testBarrel.render(screen)
+        testFireball.render(screen)
         pygame.display.flip()

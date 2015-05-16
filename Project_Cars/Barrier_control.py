@@ -8,8 +8,9 @@ LEN_BARREL_SPAWN = 100
 
 
 class Barrel_Control:
-    def __init__(self, road_x=200, road_w=299*2, window_h=700, bil=7):
+    def __init__(self, road_x=200, road_w=299*2, window_h=700, bil=5000):
         self.barrels = []
+        self.barrels_main = []
         self.x_start = road_x
         self.x_end = road_x+road_w
         # self.remove_pos = window_h
@@ -21,6 +22,12 @@ class Barrel_Control:
         barrel_field = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
         barrel_field2 = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
         barrel_field3 = self.x_start + (self.x_end-self.x_start)/(self.random_coordinate+1)*random.randint(0,self.random_coordinate)
+        if barrel_field>self.x_end-55:
+            barrel_field = self.x_end-50
+        if barrel_field2>self.x_end-55:
+            barrel_field2 = self.x_end-50
+        if barrel_field3>self.x_end-55:
+            barrel_field3 = self.x_end-50
         barrel = Barrier.Barrel((barrel_field, -150))
         barrel2 = Barrier.Barrel((barrel_field2, -100))
         barrel3 = Barrier.Barrel((barrel_field3, -50))

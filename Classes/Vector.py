@@ -50,6 +50,7 @@ class Vector:
         self.x, self.y = x, y
 
 
+
     def render(self, screen):
         pygame.draw.line(screen, (250,0,0),(0,0),(self.x,self.y))
 
